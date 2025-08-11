@@ -1,18 +1,19 @@
 <template>
-  <div class="card">
-    <h1>로그인</h1>
-    <div class="error-msg" v-if="errorMsg">{{ errorMsg }}</div>
-    <input type="text" v-model="userId" placeholder="아이디" />
-    <input type="password" v-model="userPassword" placeholder="비밀번호" />
-    <button class="btn-custom btn-login" @click="login">로그인</button>
-    <button class="btn-custom btn-signup" @click="goToSignUp">회원가입</button>
+  <div class="wrapper">
+    <div class="card">
+      <h1>로그인</h1>
+      <div class="error-msg" v-if="errorMsg">{{ errorMsg }}</div>
+      <input type="text" v-model="userId" placeholder="아이디" />
+      <input type="password" v-model="userPassword" placeholder="비밀번호" />
+      <button class="btn-custom btn-login" @click="login">로그인</button>
+      <button class="btn-custom btn-signup" @click="goToSignUp">회원가입</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-// apiRequest 함수를 사용하지 않으므로 import 제거
 
 const router = useRouter();
 
@@ -65,13 +66,20 @@ function goToSignUp() {
 </script>
 
 <style scoped>
-/* 기존 index.html의 style 태그 내용을 여기에 복사 */
-body {
-    background: linear-gradient(to right, #f8f9fa, #e9ecef);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+}
+.card {
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  background-color: white;
+  width: 350px;
+  text-align: center;
 }
 .card {
     padding: 40px;
