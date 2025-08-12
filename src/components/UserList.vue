@@ -39,7 +39,6 @@ import { apiRequest } from '@/utils/apiRequest.js';
 const router = useRouter();
 const users = ref([]);
 
-// Fetch user list on component mount
 onMounted(() => {
   fetchUsers();
 });
@@ -87,7 +86,6 @@ const deleteUser = async (userId) => {
         throw new Error("삭제 실패");
       }
 
-      // Remove the user from the local array to update the UI
       users.value = users.value.filter(user => user.userId !== userId);
     } catch (error) {
       console.error("삭제 중 오류 발생:", error);
@@ -103,7 +101,3 @@ const insertUser = () => {
   router.push('/userForm');
 };
 </script>
-
-<style scoped>
-/* No specific styles in the original file, so we can leave this empty */
-</style>

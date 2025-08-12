@@ -1,0 +1,100 @@
+/* 공통 wrapper 스타일 (로그인 전용) */
+#login-page .wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+}
+
+/* 회원가입 전용 배경 */
+#signup-page {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 공통 카드 */
+#login-page .card,
+#signup-page .card {
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  background-color: white;
+  width: 350px;
+  text-align: center;
+}
+
+/* 공통 제목 */
+#login-page h1,
+#signup-page h1 {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 30px;
+}
+
+/* 공통 인풋 */
+#login-page input,
+#signup-page input, 
+#login-page select,
+#signup-page select {
+  margin-bottom: 20px;
+  height: 40px;
+  font-size: 1rem;
+  padding: 0 10px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+}
+
+/* 공통 버튼 스타일 */
+.btn-custom {
+  font-size: 1.1rem;
+  padding: 10px 0;
+  width: 100%;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 10px;
+}
+
+/* 버튼 색상 */
+.btn-login {
+  background-color: #28a745;
+  color: white;
+}
+.btn-login:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+.btn-signup {
+  background-color: #007bff;
+  color: white;
+}
+.btn-signup:hover {
+  background-color: #0069d9;
+  transform: scale(1.05);
+}
+.btn-back {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-back:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
+
+/* 메시지 스타일 */
+.error-msg {
+  color: red;
+  margin-bottom: 10px;
+  display: block;
+}
+.success-msg {
+  color: green;
+  margin-bottom: 10px;
+  display: block;
+}

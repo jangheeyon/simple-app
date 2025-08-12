@@ -1,4 +1,3 @@
-// js/apiRequest.js의 내용을 그대로 복사
 export async function apiRequest(url, options = {}) {
     let accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
@@ -30,7 +29,7 @@ export async function apiRequest(url, options = {}) {
             alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
-            window.location.href = "/"; // index.html 대신 root 경로로 이동
+            window.location.href = "/";
             return;
         }
 

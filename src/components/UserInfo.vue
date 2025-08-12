@@ -36,7 +36,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-// apiRequest 함수를 사용하면 좋지만, 기존 코드와 동일하게 fetch를 사용하도록 하겠습니다.
 
 const router = useRouter();
 const route = useRoute();
@@ -102,7 +101,3 @@ function togglePassword() {
   passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password';
 }
 </script>
-
-<style scoped>
-/* 기존 HTML에 별도 스타일이 없으므로 비워둡니다. */
-</style>

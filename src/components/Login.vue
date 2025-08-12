@@ -1,17 +1,20 @@
 <template>
-  <div class="wrapper">
-    <div class="card">
-      <h1>로그인</h1>
-      <div class="error-msg" v-if="errorMsg">{{ errorMsg }}</div>
-      <input type="text" v-model="userId" placeholder="아이디" />
-      <input type="password" v-model="userPassword" placeholder="비밀번호" />
-      <button class="btn-custom btn-login" @click="login">로그인</button>
-      <button class="btn-custom btn-signup" @click="goToSignUp">회원가입</button>
+  <div id="login-page">
+    <div class="wrapper">
+      <div class="card">
+        <h1>로그인</h1>
+        <div class="error-msg" v-if="errorMsg">{{ errorMsg }}</div>
+        <input type="text" v-model="userId" placeholder="아이디" />
+        <input type="password" v-model="userPassword" placeholder="비밀번호" />
+        <button class="btn-custom btn-login" @click="login">로그인</button>
+        <button class="btn-custom btn-signup" @click="goToSignUp">회원가입</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import "@/assets/css/login.css";
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -64,74 +67,3 @@ function goToSignUp() {
   router.push('/signup');
 }
 </script>
-
-<style scoped>
-.wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(to right, #f8f9fa, #e9ecef);
-}
-.card {
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  background-color: white;
-  width: 350px;
-  text-align: center;
-}
-.card {
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    background-color: white;
-    width: 350px;
-    text-align: center;
-}
-h1 {
-    font-weight: 600;
-    color: #343a40;
-    margin-bottom: 30px;
-}
-input {
-    margin-bottom: 20px;
-    height: 40px;
-    font-size: 1rem;
-    padding: 0 10px;
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-}
-.btn-custom {
-    font-size: 1.1rem;
-    padding: 10px 0;
-    width: 100%;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    margin-bottom: 10px;
-}
-.btn-login {
-    background-color: #28a745;
-    color: white;
-}
-.btn-login:hover {
-    background-color: #218838;
-    transform: scale(1.05);
-}
-.btn-signup {
-    background-color: #007bff;
-    color: white;
-}
-.btn-signup:hover {
-    background-color: #0069d9;
-    transform: scale(1.05);
-}
-.error-msg {
-    color: red;
-    margin-bottom: 10px;
-    display: block;
-}
-</style>
