@@ -3,7 +3,6 @@
 </template>
 
 <script setup>
-// 스크립트가 필요 없다면 비워두어도 됩니다.
 </script>
 
 <style>
