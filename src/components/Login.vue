@@ -8,10 +8,6 @@
         <input type="password" v-model="userPassword" placeholder="비밀번호" />
         <button class="btn-custom btn-login" @click="login">로그인</button>
         <button class="btn-custom btn-signup" @click="goToSignUp">회원가입</button>
-        <!-- 임시 NewsBoard 이동 버튼 -->
-        <button class="btn-custom btn-newsboard" @click="goToNewsBoard">
-          뉴스 게시판 이동
-        </button>
       </div>
     </div>
   </div>
@@ -54,7 +50,7 @@ async function login() {
       if (accessToken && refreshToken) {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
-        router.push('/userList');
+        router.push('/newsBoard');
       } else {
         throw new Error('토큰이 응답에 없습니다.');
       }
@@ -70,9 +66,4 @@ async function login() {
 function goToSignUp() {
   router.push('/signup');
 }
-
-// 임시로 NewsBoard 이동
-const goToNewsBoard = () => {
-  router.push('/newsBoard');
-};
 </script>

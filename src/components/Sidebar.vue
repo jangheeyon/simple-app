@@ -24,11 +24,18 @@
       <li class="nav-item mb-2">
         <a class="nav-link" href="#">마이 페이지</a>
       </li>
+      <li class="nav-item mb-2" v-if="userStore.isAdmin">
+        <router-link class="nav-link" :to="{ name: 'ManageBoard' }">
+          관리 페이지
+        </router-link>
+      </li>
     </ul>
   </nav>
 </template>
 
 <script setup>
+import { useUserStore } from "@/stores/user";
+const userStore = useUserStore();
 </script>
 
 <style scoped>

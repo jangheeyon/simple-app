@@ -1,4 +1,8 @@
+import { useUserStore } from "@/stores/user";
+
 export async function apiRequest(url, options = {}) {
+    const userStore = useUserStore();
+
     let accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 
@@ -15,7 +19,9 @@ export async function apiRequest(url, options = {}) {
     if (response.status === 401 || response.status === 403) {
         if (!refreshToken) {
             alert("로그인이 필요합니다.");
-            window.location.href = "/"; // index.html 대신 root 경로로 이동
+            localStorage.clear();
+            userStore.clear();
+            window.location.href = "/";
             return;
         }
 
@@ -27,8 +33,8 @@ export async function apiRequest(url, options = {}) {
 
         if (!refreshResponse.ok) {
             alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
+            localStorage.clear();
+            userStore.clear();
             window.location.href = "/";
             return;
         }
@@ -36,6 +42,9 @@ export async function apiRequest(url, options = {}) {
         const data = await refreshResponse.json();
         localStorage.setItem("accessToken", data.accessToken);
         accessToken = data.accessToken;
+
+        // 갱신된 토큰에서 role 업데이트
+        //userStore.setToken(accessToken);
 
         // 갱신된 토큰으로 원래 요청 재시도
         options.headers["Authorization"] = `Bearer ${accessToken}`;

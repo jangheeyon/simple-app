@@ -5,6 +5,7 @@ import UserForm from '@/components/UserForm.vue';
 import UserList from '@/components/UserList.vue';
 import UserInfo from '@/components/UserInfo.vue';
 import NewsBoard from '@/components/NewsBoard.vue';
+import ManageBoard from '@/components/ManageBoard.vue';
 
 
 const routes = [
@@ -33,11 +34,16 @@ const routes = [
     name: 'UserInfo',
     component: UserInfo,
   },
-    {
+  {
     path: '/newsBoard',
     name: 'NewsBoard',
     component: NewsBoard,
   },
+  {
+    path: '/manageBoard',
+    name: 'ManageBoard',
+    component: ManageBoard,
+  }
 ];
 
 const router = createRouter({
