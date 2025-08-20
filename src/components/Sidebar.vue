@@ -24,6 +24,7 @@
       <li class="nav-item mb-2">
         <a class="nav-link" href="#">마이 페이지</a>
       </li>
+      <!-- 관리자 메뉴 -->
       <li class="nav-item mb-2" v-if="userStore.isAdmin">
         <router-link class="nav-link" :to="{ name: 'ManageBoard' }">
           관리 페이지
@@ -37,23 +38,3 @@
 import { useUserStore } from "@/stores/user";
 const userStore = useUserStore();
 </script>
-
-<style scoped>
-.sidebar {
-  border-right: 1px solid #ddd;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
-.sidebar .nav-link {
-  color: #333;
-  font-weight: 500;
-}
-
-.sidebar .nav-link.active {
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-</style>

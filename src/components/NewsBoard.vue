@@ -8,9 +8,11 @@
       <main class="col-md-10 col-lg-10 p-4 content-area">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h2>최신 뉴스</h2>
-          <div>
+
+          <div class="d-flex align-items-center">
             <input type="text" class="form-control d-inline-block me-2" style="width:200px;" placeholder="검색">
-            <button class="btn btn-outline-secondary">필터</button>
+            <button class="btn btn-outline-secondary me-2">필터</button>
+            <button class="btn btn-primary" @click="logout">로그아웃</button>
           </div>
         </div>
 
@@ -34,6 +36,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from "vue3-toastify";
+import 'vue3-toastify/dist/index.css';
 import { apiRequest } from '@/utils/apiRequest.js';
 import Sidebar from '@/components/Sidebar.vue';
 
@@ -41,26 +45,26 @@ const router = useRouter();
 const news = ref([]);
 
 const fetchNews = async () => {
-//   const accessToken = localStorage.getItem("accessToken");
-//   if (!accessToken) {
-//     alert("로그인이 필요합니다.");
-//     router.push('/');
-//     return;
-//   }
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    alert("로그인이 필요합니다.");
+    router.push('/');
+    return;
+  }
 
   try {
     const response = await apiRequest('/api/news', {
       method: 'GET',
-    //   headers: {
-    //     "Authorization": `Bearer ${accessToken}`
-    //   }
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
     });
 
-    // if (response.status === 401 || response.status === 403) {
-    //   alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-    //   router.push('/');
-    //   return;
-    // }
+    if (response.status === 401 || response.status === 403) {
+      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
+      router.push('/');
+      return;
+    }
     if (!response.ok) {
       throw new Error("뉴스 목록 API 호출 실패");
     }
@@ -75,6 +79,61 @@ const fetchNews = async () => {
 onMounted(() => {
   fetchNews();
 });
+
+const logout = async () => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "로그아웃 실패");
+    }
+
+    // 토큰 제거
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    // 토스트 메시지 표시
+    toast.success(data.message, {
+      position: "top-center",
+      autoClose: 1500,  // 1.5초 후 자동 사라짐
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+
+    // 1.5초 후 로그인 페이지 이동
+    setTimeout(() => router.push("/"), 1500);
+
+  } catch (err) {
+    console.error("로그아웃 실패:", err);
+
+    // 토큰 제거
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    toast.error(err.message || "로그아웃 중 오류가 발생했습니다.", {
+      position: "top-center",
+      autoClose: 1500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+
+    setTimeout(() => router.push("/"), 1500);
+  }
+};
 
 </script>
 

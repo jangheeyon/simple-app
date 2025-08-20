@@ -14,11 +14,12 @@
 </template>
 
 <script setup>
-import "@/assets/css/login.css";
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const userId = ref('');
 const userPassword = ref('');
@@ -36,10 +37,7 @@ async function login() {
     const response = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: userId.value,
-        userPassword: userPassword.value,
-      }),
+      body: JSON.stringify({ userId: userId.value, userPassword: userPassword.value }),
     });
 
     if (response.ok) {
@@ -48,9 +46,9 @@ async function login() {
       const refreshToken = data.refreshToken;
 
       if (accessToken && refreshToken) {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        router.push('/newsBoard');
+        userStore.setToken(accessToken); // ✅ Pinia 상태 업데이트
+        localStorage.setItem("refreshToken", refreshToken);
+        router.push("/newsBoard");
       } else {
         throw new Error('토큰이 응답에 없습니다.');
       }
@@ -61,9 +59,5 @@ async function login() {
     errorMsg.value = '로그인 중 오류가 발생했습니다.';
     console.error(err);
   }
-}
-
-function goToSignUp() {
-  router.push('/signup');
 }
 </script>
