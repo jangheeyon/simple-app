@@ -1,35 +1,62 @@
 <template>
-  <div id="signup-page">
-    <div class="card">
-      <h1>회원가입</h1>
-      <div class="error-msg" v-if="errorMsg">{{ errorMsg }}</div>
-      <div class="success-msg" v-if="successMsg">{{ successMsg }}</div>
-      <input type="text" v-model="userId" placeholder="아이디" />
-      <input type="text" v-model="userName" placeholder="이름" />
-      <input type="password" v-model="userPassword" placeholder="비밀번호" />
-      <select v-model="role">
-        <option value="">권한 선택</option>
-        <option value="ROLE_ADMIN">관리자</option>
-        <option value="ROLE_USER">일반</option>
-      </select>
-      <button class="btn-custom btn-signup" @click="signUp">회원가입</button>
-      <button class="btn-custom btn-back" @click="goBack">뒤로가기</button>
+  <div class="d-flex vh-100 justify-content-center align-items-center bg-gradient">
+    <div class="card p-4 shadow-lg rounded-4" style="width: 100%; max-width: 400px;">
+      <h1 class="text-center mb-4 text-success fw-bold">회원가입</h1>
+
+      <div v-if="successMsg" class="alert alert-success py-2 text-center">
+        {{ successMsg }}
+      </div>
+      <div v-if="errorMsg" class="alert alert-danger py-2">
+        {{ errorMsg }}
+      </div>
+      
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input type="text" v-model="userId" class="form-control" placeholder="아이디" />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" v-model="userPassword" class="form-control" placeholder="비밀번호" />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+          <input type="password" v-model="userPasswordConfirm" class="form-control" placeholder="비밀번호 확인" />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+          <input type="text" v-model="userName" class="form-control" placeholder="이름" />
+        </div>
+      </div>
+
+      <div class="d-grid gap-3 mt-3">
+        <button class="btn btn-success btn-md" @click="signUp">회원가입</button>
+        <button class="btn btn-outline-secondary btn-md" @click="goToLogin">로그인으로 돌아가기</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import "@/assets/css/login.css";
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { apiRequest } from '@/utils/apiRequest.js';
+import { useCommon } from "@/composables/useCommon"
 
-const router = useRouter();
+const { router } = useCommon()
 
 const userId = ref('');
 const userName = ref('');
 const userPassword = ref('');
-const role = ref('');
+const userPasswordConfirm = ref('');
+const role = ref('ROLE_USER');
 
 const errorMsg = ref('');
 const successMsg = ref('');
@@ -38,8 +65,14 @@ async function signUp() {
   errorMsg.value = '';
   successMsg.value = '';
 
-  if (!userId.value || !userName.value || !userPassword.value || !role.value) {
+  if (!userId.value || !userName.value || !userPassword.value || !userPasswordConfirm.value || !role.value) {
     errorMsg.value = '모든 항목을 입력하세요.';
+    return;
+  }
+
+  // 비밀번호 확인 체크
+  if (userPassword.value !== userPasswordConfirm.value) {
+    errorMsg.value = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';
     return;
   }
 
@@ -59,9 +92,10 @@ async function signUp() {
       successMsg.value = '회원가입이 완료되었습니다.';
       setTimeout(() => {
         router.push('/');
-      }, 1500);
+      }, 1000);
     } else {
-      errorMsg.value = '회원가입에 실패했습니다.';
+      const data = await response.json();
+      errorMsg.value = data.message || '회원가입에 실패했습니다.';
     }
   } catch (err) {
     errorMsg.value = '회원가입 중 오류가 발생했습니다.';
@@ -69,7 +103,7 @@ async function signUp() {
   }
 }
 
-function goBack() {
+function goToLogin() {
   router.push('/');
 }
 </script>

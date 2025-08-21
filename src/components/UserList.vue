@@ -1,42 +1,52 @@
 <template>
-  <div class="container mt-5">
-    <h1 class="mb-4">회원 목록</h1>
-    <table class="table table-bordered">
-      <thead class="table-light">
-        <tr>
-          <th>아이디</th>
-          <th>이름</th>
-          <th>삭제</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="users.length === 0">
-          <td colspan="3" class="text-center">회원 정보가 없습니다.</td>
-        </tr>
-        <tr v-for="user in users" :key="user.userId">
-          <td>{{ user.userId }}</td>
-          <td>
-            <router-link :to="{ path: '/userInfo', query: { userId: user.userId } }">
-              {{ user.userName }}
-            </router-link>
-          </td>
-          <td>
-            <button class="btn btn-danger btn-sm" @click="deleteUser(user.userId)">X</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <button class="btn btn-success" @click="moveToIndex">메인</button>
-    <button class="btn btn-success" @click="insertUser">등록</button>
+  <div class="container-fluid vh-100">
+    <div class="row h-100">
+      <!-- 사이드바 -->
+      <Sidebar />
+      <!-- 본문 -->
+      <main class="col-md-10 col-lg-10 p-4 content-area">
+        <!-- 헤더 -->
+        <Header />
+        
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>아이디</th>
+              <th>이름</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="users.length === 0">
+              <td colspan="3" class="text-center">회원 정보가 없습니다.</td>
+            </tr>
+            <tr v-for="user in users" :key="user.userId">
+              <td>{{ user.userId }}</td>
+              <td>
+                <router-link :to="{ path: '/userInfo', query: { userId: user.userId } }">
+                  {{ user.userName }}
+                </router-link>
+              </td>
+              <td>
+                <button class="btn btn-danger btn-sm" @click="deleteUser(user.userId)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      <button class="btn btn-success" @click="moveToIndex">메인</button>
+      <button class="btn btn-success" @click="insertUser">등록</button>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { apiRequest } from '@/utils/apiRequest.js';
+import { ref, onMounted } from "vue"
+import Header from "@/components/Header.vue"
+import Sidebar from "@/components/Sidebar.vue"
+import { useCommon } from "@/composables/useCommon"
 
-const router = useRouter();
+const { apiRequest, userStore, router } = useCommon()
 const users = ref([]);
 
 onMounted(() => {
@@ -44,7 +54,7 @@ onMounted(() => {
 });
 
 const fetchUsers = async () => {
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = userStore.token;
   if (!accessToken) {
     alert("로그인이 필요합니다.");
     router.push('/');

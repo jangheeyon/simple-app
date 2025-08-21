@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import * as jwtDecodePkg from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; 
 
 export const useUserStore = defineStore("user", {
   state: () => ({
+    token: null,
     role: null,
     userId: null,
   }),
@@ -12,21 +13,21 @@ export const useUserStore = defineStore("user", {
   },
   actions: {
     setToken(token) {
-      console.log("setToken 호출됨");
+      this.token = token;
 
-      const decoded = jwtDecode(token); // 이제 오류 없이 동작
-      console.log("디코딩 결과:", decoded);
-
+      const decoded = jwtDecode(token);
       this.role = decoded.role;
       this.userId = decoded.sub;
-
-      console.log("Store role after setToken:", this.role);
-      console.log("Store userId after setToken:", this.userId);
     },
     logout() {
-      localStorage.clear();
-      this.role = null;
-      this.userId = null;
+      // localStorage.clear();
+      this.$reset(); // Pinia 상태 초기화
+      localStorage.removeItem("refreshToken");
     },
+
+  },
+  persist: {
+    storage : localStorage, // Pinia 상태를 localStorage에 저장
+    paths: ["token", "role", "userId"],
   },
 });

@@ -6,179 +6,78 @@
 
       <!-- 본문 -->
       <main class="col-md-10 col-lg-10 p-4 content-area">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2>최신 뉴스</h2>
+        <!-- 헤더 -->
+        <Header />
 
-          <div class="d-flex align-items-center">
-            <input type="text" class="form-control d-inline-block me-2" style="width:200px;" placeholder="검색">
-            <button class="btn btn-outline-secondary me-2">필터</button>
-            <button class="btn btn-primary" @click="logout">로그아웃</button>
-          </div>
+        <!-- 검색창 -->
+        <div class="d-flex justify-content-start mb-3 gap-2">
+          <input type="text" class="form-control" style="width:300px;" placeholder="검색">
+          <button class="btn btn-outline-secondary" @click="$emit('filter')">필터</button>
         </div>
 
         <!-- 뉴스 리스트 -->
         <div v-if="news.length === 0">뉴스 정보가 없습니다.</div>
 
-        <div v-for="item in news" :key="item.id || item.title" class="news-card mb-3 p-3 border rounded">
+        <div 
+          v-for="item in news" 
+          :key="item.id || item.title" 
+          class="news-card mb-3 p-3 border rounded"
+        >
           <div class="d-flex align-items-center mb-1">
-            <span class="badge bg-light text-dark border me-2">버그 수정</span>
-            <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title">{{ item.title }}</a>
+            <span class="badge bg-light text-dark border me-2">키워드1</span>
+            <span class="badge bg-light text-dark border me-2">키워드2</span>
+            <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title">
+              {{ item.title }}
+            </a>
           </div>
           <div class="news-description mb-1">{{ item.description }}</div>
           <div class="news-date text-muted">{{ item.pubDt }}</div>
         </div>
-
       </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { toast } from "vue3-toastify";
-import 'vue3-toastify/dist/index.css';
-import { apiRequest } from '@/utils/apiRequest.js';
-import Sidebar from '@/components/Sidebar.vue';
+import { ref, onMounted } from "vue"
+import Header from "@/components/Header.vue"
+import Sidebar from "@/components/Sidebar.vue"
+import { useCommon } from "@/composables/useCommon"
 
-const router = useRouter();
-const news = ref([]);
+const { apiRequest, userStore, router } = useCommon()
+const news = ref([])
 
-const fetchNews = async () => {
-  const accessToken = localStorage.getItem("accessToken");
+onMounted(() => fetchNews())
+
+const fetchNews = async (keyword = "") => {
+  const accessToken = userStore.token;
   if (!accessToken) {
-    alert("로그인이 필요합니다.");
-    router.push('/');
-    return;
+    alert("로그인이 필요합니다.")
+    router.push('/')
+    return
   }
 
   try {
-    const response = await apiRequest('/api/news', {
+    const response = await apiRequest(`/api/news?keyword=${keyword}`, {
       method: 'GET',
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    })
 
     if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-      router.push('/');
-      return;
-    }
-    if (!response.ok) {
-      throw new Error("뉴스 목록 API 호출 실패");
+      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.")
+      router.push('/')
+      return
     }
 
-    const data = await response.json();
-    news.value = data;
-  } catch (error) {
-    console.error("오류 발생:", error);
-  }
-};
+    if (!response.ok) throw new Error("뉴스 목록 API 호출 실패")
 
-onMounted(() => {
-  fetchNews();
-});
-
-const logout = async () => {
-  const accessToken = localStorage.getItem("accessToken");
-
-  try {
-    const response = await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "로그아웃 실패");
-    }
-
-    // 토큰 제거
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-
-    // 토스트 메시지 표시
-    toast.success(data.message, {
-      position: "top-center",
-      autoClose: 1500,  // 1.5초 후 자동 사라짐
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    // 1.5초 후 로그인 페이지 이동
-    setTimeout(() => router.push("/"), 1500);
-
+    news.value = await response.json()
   } catch (err) {
-    console.error("로그아웃 실패:", err);
-
-    // 토큰 제거
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-
-    toast.error(err.message || "로그아웃 중 오류가 발생했습니다.", {
-      position: "top-center",
-      autoClose: 1500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    setTimeout(() => router.push("/"), 1500);
+    console.error("오류 발생:", err)
   }
-};
+}
 
+const onFilter = () => {
+  console.log("필터 실행")
+}
 </script>
-
-<style scoped>
-.sidebar {
-  border-right: 1px solid #ddd;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
-.sidebar .nav-link {
-  color: #333;
-  font-weight: 500;
-}
-
-.sidebar .nav-link.active {
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-
-.content-area {
-  margin-left: 16.6667%;
-}
-
-.news-card {
-  background-color: #fff;
-}
-
-.news-title {
-  font-weight: 600;
-  text-decoration: none;
-  color: #333;
-}
-
-.news-title:hover {
-  text-decoration: underline;
-}
-
-.news-description {
-  color: #555;
-}
-
-.news-date {
-  font-size: 0.85rem;
-}
-</style>
