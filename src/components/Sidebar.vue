@@ -62,7 +62,11 @@
             <i class="bi bi-gear me-2"></i> 회원 관리
           </router-link>
         </li>
-
+        <li class="nav-item">
+          <router-link class="nav-link d-flex align-items-center" :class="{ active: $route.name === 'KeywordList' }" :to="{ name: 'KeywordList' }">
+            <i class="bi bi-gear me-2"></i> 키워드 관리
+          </router-link>
+        </li>
       </ul>
     </div>
   </nav>

@@ -3,38 +3,60 @@
     <div class="row h-100">
       <!-- 사이드바 -->
       <Sidebar />
+
       <!-- 본문 -->
       <main class="col-md-10 col-lg-10 p-4 content-area">
         <!-- 헤더 -->
         <Header />
-        
-        <table class="table table-bordered">
-          <thead class="table-light">
-            <tr>
-              <th>아이디</th>
-              <th>이름</th>
-              <th>삭제</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="users.length === 0">
-              <td colspan="3" class="text-center">회원 정보가 없습니다.</td>
-            </tr>
-            <tr v-for="user in users" :key="user.userId">
-              <td>{{ user.userId }}</td>
-              <td>
-                <router-link :to="{ path: '/userInfo', query: { userId: user.userId } }">
-                  {{ user.userName }}
-                </router-link>
-              </td>
-              <td>
-                <button class="btn btn-danger btn-sm" @click="deleteUser(user.userId)">X</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      <button class="btn btn-success" @click="moveToIndex">메인</button>
-      <button class="btn btn-success" @click="insertUser">등록</button>
+
+        <!-- 카드 레이아웃 -->
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="card-title mb-0">회원</h4>
+              <button class="btn btn-success" @click="insertUser">
+                + 회원 등록
+              </button>
+            </div>
+
+            <!-- 회원 테이블 -->
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th style="width: 30%">아이디</th>
+                    <th style="width: 50%">이름</th>
+                    <th style="width: 20%">삭제</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="users.length === 0">
+                    <td colspan="3" class="text-center">회원 정보가 없습니다.</td>
+                  </tr>
+                  <tr v-for="user in users" :key="user.userId">
+                    <td class="text-center">{{ user.userId }}</td>
+                    <td>
+                      <router-link
+                        :to="{ path: '/userInfo', query: { userId: user.userId } }"
+                        class="text-decoration-none"
+                      >
+                        {{ user.userName }}
+                      </router-link>
+                    </td>
+                    <td class="text-center">
+                      <button
+                        class="btn btn-outline-danger btn-sm"
+                        @click="deleteUser(user.userId)"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -101,10 +123,6 @@ const deleteUser = async (userId) => {
       console.error("삭제 중 오류 발생:", error);
     }
   }
-};
-
-const moveToIndex = () => {
-  router.push('/');
 };
 
 const insertUser = () => {
