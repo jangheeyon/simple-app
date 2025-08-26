@@ -24,8 +24,7 @@
           class="news-card mb-3 p-3 border rounded"
         >
           <div class="d-flex align-items-center mb-1">
-            <span class="badge bg-light text-dark border me-2">키워드1</span>
-            <span class="badge bg-light text-dark border me-2">키워드2</span>
+            <span class="badge bg-light text-dark border me-2">{{ item.keywords }}</span>
             <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title">
               {{ item.title }}
             </a>

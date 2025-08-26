@@ -6,6 +6,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 import 'vue3-toastify/dist/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/assets/main.css'; // 사용자 정의 스타일이 부트스트랩보다 우선 적용되도록 마지막에 import 합니다.
 
 const app = createApp(App);
 const pinia = createPinia();

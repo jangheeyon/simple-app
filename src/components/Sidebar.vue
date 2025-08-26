@@ -1,6 +1,6 @@
 <template>
   <nav class="col-md-2 col-lg-2 bg-light sidebar p-3 vh-100 border-end d-flex flex-column">
-    <h3 class="mb-3 fw-bold text-secondary">목록</h3>
+    <h3 class="mb-3 fw-bold text-secondary">맞춤형 서비스</h3>
     <!-- 뉴스 섹션 -->
     <div class="mb-4">      
       <ul class="nav nav-pills flex-column gap-1">
