@@ -6,7 +6,6 @@ export async function apiRequest(url, options = {}) {
     let accessToken = userStore.token;
     const refreshToken = localStorage.getItem("refreshToken");
 
-    // Authorization 헤더 자동 추가
     options.headers = {
         ...options.headers,
         "Content-Type": "application/json",
@@ -24,7 +23,7 @@ export async function apiRequest(url, options = {}) {
             return;
         }
 
-        const refreshResponse = await fetch("/refresh", {
+        const refreshResponse = await fetch("/api/refresh", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refreshToken })
@@ -40,9 +39,6 @@ export async function apiRequest(url, options = {}) {
         const data = await refreshResponse.json();
         userStore.setToken(data.accessToken);
         accessToken = data.accessToken;
-
-        // 갱신된 토큰에서 role 업데이트
-        //userStore.setToken(accessToken);
 
         // 갱신된 토큰으로 원래 요청 재시도
         options.headers["Authorization"] = `Bearer ${accessToken}`;

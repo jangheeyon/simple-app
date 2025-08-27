@@ -11,26 +11,30 @@
 
         <!-- 검색창 -->
         <div class="d-flex justify-content-start mb-3 gap-2">
-          <input type="text" class="form-control" style="width:300px;" placeholder="검색">
-          <button class="btn btn-outline-secondary" @click="$emit('filter')">필터</button>
+          <input type="text" class="form-control" style="width: 300px" placeholder="검색" />
+          <button class="btn btn-outline-secondary" @click="onFilter">필터</button>
         </div>
 
         <!-- 뉴스 리스트 -->
         <div v-if="news.length === 0">뉴스 정보가 없습니다.</div>
-
-        <div 
-          v-for="item in news" 
-          :key="item.id || item.title" 
-          class="news-card mb-3 p-3 border rounded"
-        >
-          <div class="d-flex align-items-center mb-1">
-            <span class="badge bg-light text-dark border me-2">{{ item.keywords }}</span>
-            <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title">
-              {{ item.title }}
-            </a>
+        <div v-else>
+          <div v-for="item in news" :key="item.newsId">
+            <div class="news-card mb-3 p-3 border rounded d-flex justify-content-between align-items-center" v-if="item.visible || userStore.isAdmin">
+              <!-- 뉴스 정보 -->
+              <div class="flex-grow-1">
+                <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
+                <div class="news-description mb-1" :class="{ 'text-muted': item.visible === false }"> {{item.description }} </div> 
+                <div class="news-date text-muted">{{ item.pubDt }}</div>
+              </div>
+              <!-- 관리자 전용 토글 스위치 -->
+              <div v-if="userStore.isAdmin" class="form-check form-switch ms-3">
+                <input class="form-check-input" type="checkbox" role="switch" :id="'news-switch-' + item.newsId" :checked="item.visible" @change="toggleVisibility(item)" style="cursor: pointer"/>
+                <label class="form-check-label" :for="'news-switch-' + item.newsId">
+                  {{ item.visible ? '공개' : '숨김' }}
+                </label>
+              </div>
+            </div>
           </div>
-          <div class="news-description mb-1">{{ item.description }}</div>
-          <div class="news-date text-muted">{{ item.pubDt }}</div>
         </div>
       </main>
     </div>
@@ -38,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import Header from "@/components/Header.vue"
 import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
@@ -57,9 +61,9 @@ const fetchNews = async (keyword = "") => {
   }
 
   try {
-    const response = await apiRequest(`/api/news?keyword=${keyword}`, {
+    const response = await apiRequest(`/api/news?keyword=${encodeURIComponent(keyword)}`, {
       method: 'GET',
-      headers: { "Authorization": `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` },
     })
 
     if (response.status === 401 || response.status === 403) {
@@ -68,11 +72,47 @@ const fetchNews = async (keyword = "") => {
       return
     }
 
-    if (!response.ok) throw new Error("뉴스 목록 API 호출 실패")
+    if (!response.ok) throw new Error('뉴스 목록 API 호출 실패')
 
     news.value = await response.json()
   } catch (err) {
-    console.error("오류 발생:", err)
+    console.error('오류 발생:', err)
+    alert(err.message || '뉴스 목록을 가져오는 중 오류가 발생했습니다.')
+  }
+}
+
+//관리자 토글
+async function toggleVisibility(newsItem) {
+  const originalVisible = newsItem.visible
+  newsItem.visible = !newsItem.visible
+
+  try {
+    const accessToken = userStore.token
+    if (!accessToken) {
+      alert('인증이 만료되었습니다. 다시 로그인해주세요.')
+      newsItem.visible = originalVisible
+      router.push('/')
+      return
+    }
+
+    const response = await apiRequest(`/api/admin/news/${newsItem.newsId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ visible: newsItem.visible }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(errorText || '뉴스 상태 변경에 실패했습니다.')
+    }
+  } catch (error) {
+    // 실패 시 롤백
+    newsItem.visible = originalVisible
+    console.error('뉴스 상태 변경 중 오류 발생:', error)
+    alert('오류: ' + error.message)
   }
 }
 
