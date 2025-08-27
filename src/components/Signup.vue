@@ -56,7 +56,7 @@ const userId = ref('');
 const userName = ref('');
 const userPassword = ref('');
 const userPasswordConfirm = ref('');
-const role = ref('ROLE_USER');
+const role = ref('USER');
 
 const errorMsg = ref('');
 const successMsg = ref('');

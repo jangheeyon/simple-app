@@ -49,8 +49,8 @@
             <label for="role" class="form-label">권한</label>
             <select id="role" class="form-select" v-model="user.role" required>
               <option value="">권한 선택</option>
-              <option value="ROLE_ADMIN">관리자</option>
-              <option value="ROLE_USER">일반</option>
+              <option value="ADMIN">관리자</option>
+              <option value="USER">일반</option>
             </select>
           </div>
 
