@@ -24,7 +24,12 @@
               <div class="flex-grow-1">
                 <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
                 <div class="news-description mb-1" :class="{ 'text-muted': item.visible === false }"> {{item.description }} </div> 
-                <div class="news-date text-muted">{{ item.pubDt }}</div>
+                <div class="d-flex align-items-center">
+                  <div class="news-date text-muted me-3">{{ item.pubDt }}</div>
+                  <button @click="toggleLike(item)" class="btn btn-sm" :class="item.liked ? 'btn-primary' : 'btn-outline-primary'">
+                    좋아요 {{ item.likeCount }}
+                  </button>
+                </div>
               </div>
               <!-- 관리자 전용 토글 스위치 -->
               <div v-if="userStore.isAdmin" class="form-check form-switch ms-3">
@@ -74,10 +79,44 @@ const fetchNews = async (keyword = "") => {
 
     if (!response.ok) throw new Error('뉴스 목록 API 호출 실패')
 
-    news.value = await response.json()
+    const newsData = await response.json();
+        news.value = newsData.map(item => ({
+      ...item,
+      likeCount: item.likeCount || 0,
+      isLiked: item.liked || false,
+    }));
+
   } catch (err) {
     console.error('오류 발생:', err)
     alert(err.message || '뉴스 목록을 가져오는 중 오류가 발생했습니다.')
+  }
+}
+
+// 뉴스 좋아요 토글
+async function toggleLike(newsItem) {
+  try {
+    const response = await apiRequest(`/api/news/${newsItem.newsId}/like`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error('좋아요 처리 중 오류가 발생했습니다.');
+    }
+
+    const result = await response.json();
+    newsItem.liked = result.liked;
+    
+    if (result.liked) {
+      newsItem.likeCount++;
+    } else {
+      if (newsItem.likeCount > 0) {
+        newsItem.likeCount--;
+      }
+    }
+
+  } catch (error) {
+    console.error('좋아요 처리 실패:', error);
+    alert(error.message || '좋아요 처리에 실패했습니다.');
   }
 }
 
