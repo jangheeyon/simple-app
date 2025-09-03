@@ -11,8 +11,8 @@
 
         <!-- 검색창 -->
         <div class="d-flex justify-content-start mb-3 gap-2">
-          <input type="text" class="form-control" style="width: 300px" placeholder="검색" />
-          <button class="btn btn-outline-secondary" @click="onFilter">필터</button>
+          <input type="text" class="form-control" style="width: 300px" placeholder="검색" v-model="searchQuery" @keyup.enter="searchNews" />
+          <button class="btn btn-outline-secondary" @click="searchNews">검색</button>
         </div>
 
         <!-- 뉴스 리스트 -->
@@ -22,6 +22,11 @@
             <div class="news-card mb-3 p-3 border rounded d-flex justify-content-between align-items-center" v-if="item.visible || userStore.isAdmin">
               <!-- 뉴스 정보 -->
               <div class="flex-grow-1">
+                <template v-if="item.keywords">
+                  <span v-for="keyword in item.keywords.split(',')" :key="keyword.trim()" class="keyword-pill badge bg-secondary text-white rounded-pill me-2 px-3 py-1 fw-normal">
+                    {{ keyword.trim() }}
+                  </span>
+                </template>
                 <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
                 <div class="news-description mb-1" :class="{ 'text-muted': item.visible === false }"> {{item.description }} </div> 
                 <div class="d-flex align-items-center">
@@ -47,13 +52,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted } from "vue"
 import Header from "@/components/Header.vue"
 import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
 const news = ref([])
+const searchQuery = ref("")
 
 onMounted(() => fetchNews())
 
@@ -91,6 +97,47 @@ const fetchNews = async (keyword = "") => {
     alert(err.message || '뉴스 목록을 가져오는 중 오류가 발생했습니다.')
   }
 }
+
+const searchNews = async () => {
+  const accessToken = userStore.token;
+  if (!accessToken) {
+    alert("로그인이 필요합니다.");
+    router.push('/');
+    return;
+  }
+
+  if (!searchQuery.value.trim()) {
+    fetchNews();
+    return;
+  }
+
+  try {
+    const response = await apiRequest(`/api/news/search?q=${encodeURIComponent(searchQuery.value)}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
+      router.push('/');
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error('뉴스 검색 API 호출 실패');
+    }
+
+    const searchData = await response.json();
+    news.value = searchData.map(item => ({
+      ...item,
+      likeCount: item.likeCount || 0,
+      isLiked: item.liked || false,
+    }));
+  } catch (err) {
+    console.error('오류 발생:', err);
+    alert(err.message || '뉴스 검색 중 오류가 발생했습니다.');
+  }
+};
 
 // 뉴스 좋아요 토글
 async function toggleLike(newsItem) {
@@ -153,9 +200,5 @@ async function toggleVisibility(newsItem) {
     console.error('뉴스 상태 변경 중 오류 발생:', error)
     alert('오류: ' + error.message)
   }
-}
-
-const onFilter = () => {
-  console.log("필터 실행")
 }
 </script>
