@@ -46,6 +46,30 @@
             </div>
           </div>
         </div>
+        <!-- 관련 뉴스 섹션 -->
+        <div v-if="similarNews.length > 0">
+          <hr class="my-4"/>
+          <h4 class="mb-3">관련 뉴스</h4>
+          <div v-for="item in similarNews" :key="item.newsId">
+            <div class="news-card similar-news-card mb-3 p-3 border rounded d-flex justify-content-between align-items-center">
+              <div class="flex-grow-1">
+                <template v-if="item.keywords">
+                  <span v-for="keyword in item.keywords.split(',')" :key="keyword.trim()" class="keyword-pill badge bg-secondary text-white rounded-pill me-2 px-3 py-1 fw-normal">
+                    {{ keyword.trim() }}
+                  </span>
+                </template>
+                <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
+                <div class="news-description mb-1"> {{item.description }} </div> 
+                <div class="d-flex align-items-center">
+                  <div class="news-date text-muted me-3">{{ item.pubDt }}</div>
+                  <button @click="toggleLike(item)" class="btn btn-sm" :class="item.liked ? 'btn-primary' : 'btn-outline-primary'">
+                    좋아요 {{ item.likeCount }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -59,6 +83,7 @@ import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
 const news = ref([])
+const similarNews = ref([]);
 const searchQuery = ref("")
 
 onMounted(() => fetchNews())
@@ -99,44 +124,75 @@ const fetchNews = async (keyword = "") => {
 }
 
 const searchNews = async () => {
-  const accessToken = userStore.token;
-  if (!accessToken) {
-    alert("로그인이 필요합니다.");
-    router.push('/');
-    return;
-  }
-
-  if (!searchQuery.value.trim()) {
-    fetchNews();
-    return;
-  }
-
-  try {
-    const response = await apiRequest(`/api/news/search?q=${encodeURIComponent(searchQuery.value)}`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-      router.push('/');
-      return;
+    const accessToken = userStore.token;
+    if (!accessToken) {
+        alert("로그인이 필요합니다.");
+        router.push('/');
+        return;
     }
 
-    if (!response.ok) {
-      throw new Error('뉴스 검색 API 호출 실패');
+    if (!searchQuery.value.trim()) {
+        fetchNews();
+        similarNews.value = [];
+        return;
     }
 
-    const searchData = await response.json();
-    news.value = searchData.map(item => ({
-      ...item,
-      likeCount: item.likeCount || 0,
-      isLiked: item.liked || false,
-    }));
-  } catch (err) {
-    console.error('오류 발생:', err);
-    alert(err.message || '뉴스 검색 중 오류가 발생했습니다.');
-  }
+    //뉴스 초기화
+    news.value = [];
+    similarNews.value = [];
+
+    try {
+        // 뉴스 검색
+        const response = await apiRequest(`/api/news/search?q=${encodeURIComponent(searchQuery.value)}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
+            router.push('/');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error('뉴스 검색 API 호출 실패');
+        }
+
+        const searchData = await response.json();
+        news.value = searchData.map(item => ({
+            ...item,
+            likeCount: item.likeCount || 0,
+            isLiked: item.liked || false,
+        }));
+        
+        // 유사 뉴스 검색
+        if (news.value.length > 0) {
+            const firstNewsId = news.value[0].newsId; // 첫 번째 뉴스 ID 추출
+
+            const similarNewsResponse = await apiRequest(`/api/news/${firstNewsId}/similar`, {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            if (similarNewsResponse.ok) {
+                const similarNewsData = await similarNewsResponse.json();
+                similarNews.value = similarNewsData.map(item => ({
+                    ...item,
+                    likeCount: item.likeCount || 0,
+                    isLiked: item.liked || false,
+                }));
+            } else {
+                console.error('유사 뉴스 API 호출 실패');
+                similarNews.value = [];
+            }
+        }
+
+    } catch (err) {
+        console.error('오류 발생:', err);
+        alert(err.message || '뉴스 검색 중 오류가 발생했습니다.');
+        news.value = [];
+        similarNews.value = [];
+    } 
 };
 
 // 뉴스 좋아요 토글
