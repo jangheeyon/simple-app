@@ -67,6 +67,31 @@
             </div>
           </div>
         </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title">키워드별 좋아요 수</h5>
+              </div>
+              <div class="card-body">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>키워드</th>
+                      <th>좋아요 수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="keyword in totalLikesByKeyword" :key="keyword.keyword">
+                      <td>{{ keyword.keyword }}</td>
+                      <td>{{ keyword.totalLikes }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -83,11 +108,13 @@ const { userStore, router } = useCommon()
 
 const topLikedNews = ref([])
 const topViewedNews = ref([])
+const totalLikesByKeyword = ref([])
 
 const fetchStatistics = async () => {
   try {
     topLikedNews.value = await apiRequestJson("/api/admin/statistics/topLiked")
     topViewedNews.value = await apiRequestJson("/api/admin/statistics/topViewed")
+    totalLikesByKeyword.value = await apiRequestJson("/api/admin/statistics/totalLikesByKeyword")
   } catch (error) {
     console.error("Error fetching statistics:", error)
   }
