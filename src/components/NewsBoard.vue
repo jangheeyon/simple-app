@@ -27,7 +27,7 @@
                     {{ keyword.trim() }}
                   </span>
                 </template>
-                <a :href="item.link" target="_blank" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
+                <a :href="item.link" target="_blank" @click="countView(item)" rel="noopener noreferrer" class="news-title text-decoration-none fw-bold"> {{ item.title }} </a>
                 <div class="news-description mb-1" :class="{ 'text-muted': item.visible === false }"> {{item.description }} </div> 
                 <div class="d-flex align-items-center">
                   <div class="news-date text-muted me-3">{{ item.pubDt }}</div>
@@ -255,6 +255,21 @@ async function toggleVisibility(newsItem) {
     newsItem.visible = originalVisible
     console.error('뉴스 상태 변경 중 오류 발생:', error)
     alert('오류: ' + error.message)
+  }
+}
+
+// 뉴스 조회수 카운트
+async function countView(newsItem) {
+  try {
+    const
+      response = await apiRequest(`/api/news/${newsItem.newsId}/view`, {
+      method: 'POST',
+    })
+    if (!response.ok) {
+      throw new Error('조회수 처리 중 오류가 발생했습니다.')
+    }
+  } catch (error) {
+    console.error('조회수 처리 실패:', error)
   }
 }
 </script>

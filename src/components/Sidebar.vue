@@ -58,7 +58,7 @@
       <ul class="nav nav-pills flex-column gap-1">
         <li class="nav-item">
           <router-link class="nav-link d-flex align-items-center" :class="{ active: $route.name === 'ManageBoard' }" :to="{ name: 'ManageBoard' }">
-            <i class="bi bi-gear me-2"></i> 전체 관리 페이지
+            <i class="bi bi-gear me-2"></i> 통계 및 분석 대시보드
           </router-link>
         </li>
         <li class="nav-item">

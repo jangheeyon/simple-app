@@ -9,6 +9,64 @@
         <!-- 헤더 -->
         <Header />
 
+        <h1 class="h3 mb-3">통계 및 분석 대시보드</h1>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title">가장 많이 추천된 뉴스</h5>
+              </div>
+              <div class="card-body">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>제목</th>
+                      <th>추천 수</th>
+                      <th>조회 수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="news in topLikedNews" :key="news.newsId">
+                      <td>
+                        <a :href="news.link" target="_blank" rel="noopener noreferrer">{{ news.title }}</a>
+                      </td>
+                      <td>{{ news.likeCount }}</td>
+                      <td>{{ news.viewCount }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title">가장 많이 조회된 뉴스</h5>
+              </div>
+              <div class="card-body">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>제목</th>
+                      <th>추천 수</th>
+                      <th>조회 수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="news in topViewedNews" :key="news.newsId">
+                      <td>
+                        <a :href="news.link" target="_blank" rel="noopener noreferrer">{{ news.title }}</a>
+                      </td>
+                      <td>{{ news.likeCount }}</td>
+                      <td>{{ news.viewCount }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -19,41 +77,23 @@ import { ref, onMounted } from "vue"
 import Header from "@/components/Header.vue"
 import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
+import { apiRequestJson } from "@/utils/apiRequest"
 
-const { apiRequest, userStore, router } = useCommon()
-const news = ref([])
+const { userStore, router } = useCommon()
 
-onMounted(() => fetchNews())
+const topLikedNews = ref([])
+const topViewedNews = ref([])
 
-const fetchNews = async (keyword = "") => {
-  const accessToken = userStore.token;
-  if (!accessToken) {
-    alert("로그인이 필요합니다.")
-    router.push('/')
-    return
-  }
-
+const fetchStatistics = async () => {
   try {
-    const response = await apiRequest(`/api/news?keyword=${keyword}`, {
-      method: 'GET',
-      headers: { "Authorization": `Bearer ${accessToken}` }
-    })
-
-    if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.")
-      router.push('/')
-      return
-    }
-
-    if (!response.ok) throw new Error("뉴스 목록 API 호출 실패")
-
-    news.value = await response.json()
-  } catch (err) {
-    console.error("오류 발생:", err)
+    topLikedNews.value = await apiRequestJson("/api/admin/statistics/topLiked")
+    topViewedNews.value = await apiRequestJson("/api/admin/statistics/topViewed")
+  } catch (error) {
+    console.error("Error fetching statistics:", error)
   }
 }
 
-const onFilter = () => {
-  console.log("필터 실행")
-}
+onMounted(() => {
+  fetchStatistics()
+})
 </script>
