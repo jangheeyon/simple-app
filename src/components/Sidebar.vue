@@ -19,9 +19,13 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="#">
+          <router-link
+            class="nav-link d-flex align-items-center"
+            :class="{ active: $route.name === 'RcmdNewsBoard' }"
+            :to="{ name: 'RcmdNewsBoard' }"
+          >
             <i class="bi bi-star me-2"></i> 추천 뉴스
-          </a>
+          </router-link>
         </li>
       </ul>
     </div>
