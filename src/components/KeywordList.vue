@@ -13,7 +13,7 @@
         <div class="card shadow-sm">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h4 class="card-title mb-0">키워드</h4>
+              <h4 class="card-title mb-0">관심 키워드</h4>
               <button class="btn btn-success" @click="insertKeyword">
                 + 키워드 등록
               </button>
@@ -25,7 +25,6 @@
                 <thead class="table-light text-center">
                   <tr>
                     <th style="width: 40%">키워드</th>
-                    <th style="width: 40%">등록자</th>
                     <th style="width: 20%">삭제</th>
                   </tr>
                 </thead>
@@ -35,7 +34,6 @@
                   </tr>
                   <tr v-for="keyword in keywords" :key="keyword.keywordId">
                     <td>{{ keyword.keyword }}</td>
-                    <td>{{ keyword.userId }}</td>
                     <td class="text-center">
                       <button
                         class="btn btn-outline-danger btn-sm"
@@ -62,6 +60,7 @@ import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
 const keywords = ref([]);
+const userId = userStore.userId;
 
 onMounted(() => {
   fetchkeywords();
@@ -76,7 +75,7 @@ const fetchkeywords = async () => {
     }
 
     try {
-        const response = await apiRequest('/api/news/keyword', {
+        const response = await apiRequest(`/api/news/keyword/${userId}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${accessToken}`
@@ -99,8 +98,8 @@ const fetchkeywords = async () => {
     }
 };
 
-const deletekeyword = async (keywordId) => {
-  if (confirm(keywordId + "을(를) 삭제하시겠습니까?")) {
+const deleteKeyword = async (keywordId) => {
+  if (confirm("해당 키워드를 삭제하시겠습니까?")) {
     try {
       const response = await apiRequest(`/api/news/keyword/${keywordId}`, {
         method: 'DELETE',

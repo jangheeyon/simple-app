@@ -10,13 +10,17 @@
             :class="{ active: $route.name === 'NewsBoard' }"
             :to="{ name: 'NewsBoard' }"
           >
-            <i class="bi bi-newspaper me-2"></i> 최신 뉴스
+            <i class="bi bi-newspaper me-2"></i> 전체 뉴스
           </router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="#">
-            <i class="bi bi-bar-chart-line me-2"></i> 인기 뉴스
-          </a>
+          <router-link
+            class="nav-link d-flex align-items-center"
+            :class="{ active: $route.name === 'SubscNewsBoard' }"
+            :to="{ name: 'SubscNewsBoard' }"
+          >
+            <i class="bi bi-newspaper me-2"></i> 구독한 뉴스
+          </router-link>
         </li>
         <li class="nav-item">
           <router-link
@@ -36,18 +40,13 @@
       <ul class="nav nav-pills flex-column gap-1">
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="#">
-            <i class="bi bi-search me-2"></i> 검색
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="#">
             <i class="bi bi-bell me-2"></i> 내 알림
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="#">
-            <i class="bi bi-person me-2"></i> 마이 페이지
-          </a>
+          <router-link class="nav-link d-flex align-items-center" :class="{ active: $route.name === 'KeywordList' }" :to="{ name: 'KeywordList' }">
+            <i class="bi bi-gear me-2"></i> 마이페이지
+          </router-link>
         </li>
       </ul>
     </div>
@@ -64,11 +63,6 @@
         <li class="nav-item">
           <router-link class="nav-link d-flex align-items-center" :class="{ active: $route.name === 'UserList' }" :to="{ name: 'UserList' }">
             <i class="bi bi-gear me-2"></i> 회원 관리
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link d-flex align-items-center" :class="{ active: $route.name === 'KeywordList' }" :to="{ name: 'KeywordList' }">
-            <i class="bi bi-gear me-2"></i> 키워드 관리
           </router-link>
         </li>
       </ul>
