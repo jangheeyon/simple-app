@@ -97,7 +97,7 @@ const fetchNews = async (keyword = "") => {
   }
 
   try {
-    const response = await apiRequest(`/api/news?keyword=${encodeURIComponent(keyword)}`, {
+    const response = await apiRequest('/api/news/subscribe', {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     })
