@@ -118,9 +118,63 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
 const { userStore, router } = useCommon()
 
-const topLikedNews = ref([])
-const topViewedNews = ref([])
-const totalLikesByKeyword = ref([])
+
+// 더미 데이터
+const topLikedNews = ref([
+  {
+    newsId: 1,
+    title: 'AI 혁신 뉴스',
+    link: 'https://example.com/news1',
+    likeCount: 12,
+    viewCount: 100
+  },
+  {
+    newsId: 2,
+    title: '프론트엔드 동향',
+    link: 'https://example.com/news2',
+    likeCount: 8,
+    viewCount: 80
+  },
+  {
+    newsId: 3,
+    title: '테스트 자동화',
+    link: 'https://example.com/news3',
+    likeCount: 5,
+    viewCount: 60
+  }
+])
+
+const topViewedNews = ref([
+  {
+    newsId: 4,
+    title: '클라우드 트렌드',
+    link: 'https://example.com/news4',
+    likeCount: 3,
+    viewCount: 150
+  },
+  {
+    newsId: 5,
+    title: '보안 이슈',
+    link: 'https://example.com/news5',
+    likeCount: 2,
+    viewCount: 120
+  },
+  {
+    newsId: 6,
+    title: '개발자 커뮤니티',
+    link: 'https://example.com/news6',
+    likeCount: 1,
+    viewCount: 110
+  }
+])
+
+const totalLikesByKeyword = ref([
+  { keyword: 'AI', totalLikes: 10 },
+  { keyword: '프론트엔드', totalLikes: 7 },
+  { keyword: '테스트', totalLikes: 5 },
+  { keyword: '클라우드', totalLikes: 3 },
+  { keyword: '보안', totalLikes: 2 }
+])
 
 const chartData = computed(() => ({
   labels: totalLikesByKeyword.value.map((item) => item.keyword),
@@ -137,17 +191,5 @@ const chartOptions = {
   maintainAspectRatio: false,
 }
 
-const fetchStatistics = async () => {
-  try {
-    topLikedNews.value = await apiRequestJson("/api/admin/statistics/topLiked")
-    topViewedNews.value = await apiRequestJson("/api/admin/statistics/topViewed")
-    totalLikesByKeyword.value = await apiRequestJson("/api/admin/statistics/totalLikesByKeyword")
-  } catch (error) {
-    console.error("Error fetching statistics:", error)
-  }
-}
-
-onMounted(() => {
-  fetchStatistics()
-})
+// 더미 데이터만 사용하므로 fetchStatistics 불필요
 </script>

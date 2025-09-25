@@ -39,40 +39,45 @@ const userId = ref('');
 const userPassword = ref('');
 const errorMsg = ref('');
 
-async function login() {
-  errorMsg.value = '';
+// async function login() {
+//   errorMsg.value = '';
 
-  if (!userId.value || !userPassword.value) {
-    errorMsg.value = '아이디와 비밀번호를 모두 입력하세요.';
-    return;
-  }
+//   if (!userId.value || !userPassword.value) {
+//     errorMsg.value = '아이디와 비밀번호를 모두 입력하세요.';
+//     return;
+//   }
 
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: userId.value, userPassword: userPassword.value }),
-    });
+//   try {
+//     const response = await fetch('/api/login', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ userId: userId.value, userPassword: userPassword.value }),
+//     });
 
-    if (response.ok) {
-      const data = await response.json();
-      const accessToken = data.accessToken;
-      const refreshToken = data.refreshToken;
+//     if (response.ok) {
+//       const data = await response.json();
+//       const accessToken = data.accessToken;
+//       const refreshToken = data.refreshToken;
 
-      if (accessToken && refreshToken) {
-        userStore.setToken(accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        router.push("/newsBoard");
-      } else {
-        throw new Error('토큰이 응답에 없습니다.');
-      }
-    } else {
-      errorMsg.value = '아이디 또는 비밀번호가 올바르지 않습니다.';
-    }
-  } catch (err) {
-    errorMsg.value = '로그인 중 오류가 발생했습니다.';
-    console.error(err);
-  }
+//       if (accessToken && refreshToken) {
+//         userStore.setToken(accessToken);
+//         localStorage.setItem("refreshToken", refreshToken);
+//         router.push("/newsBoard");
+//       } else {
+//         throw new Error('토큰이 응답에 없습니다.');
+//       }
+//     } else {
+//       errorMsg.value = '아이디 또는 비밀번호가 올바르지 않습니다.';
+//     }
+//   } catch (err) {
+//     errorMsg.value = '로그인 중 오류가 발생했습니다.';
+//     console.error(err);
+//   }
+// }
+
+//뉴스보드 화면 이동
+function login() {
+  router.push('/newsBoard');
 }
 
 //회원가입 화면 이동

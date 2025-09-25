@@ -53,107 +53,70 @@ import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
+
 const rcmdNews = ref([])
+
+// 더미 추천 뉴스 데이터
+const dummyRcmdNews = [
+  {
+    newsId: 11,
+    title: '추천 더미 뉴스 1',
+    description: '추천 뉴스 더미 설명입니다.',
+    link: 'https://example.com/rcmd1',
+    pubDt: '2025-09-25',
+    keywords: '추천,AI',
+    likeCount: 7,
+    liked: false,
+    visible: true
+  },
+  {
+    newsId: 12,
+    title: '추천 더미 뉴스 2',
+    description: '두 번째 추천 더미 뉴스 설명입니다.',
+    link: 'https://example.com/rcmd2',
+    pubDt: '2025-09-24',
+    keywords: '추천,테스트',
+    likeCount: 3,
+    liked: true,
+    visible: true
+  },
+  {
+    newsId: 13,
+    title: '추천 더미 뉴스 3',
+    description: '세 번째 추천 더미 뉴스 설명입니다.',
+    link: 'https://example.com/rcmd3',
+    pubDt: '2025-09-23',
+    keywords: '추천,Vue',
+    likeCount: 0,
+    liked: false,
+    visible: false
+  }
+];
+
 
 onMounted(() => {
   fetchRecommendedNews()
 })
 
 const fetchRecommendedNews = async () => {
-  const accessToken = userStore.token;
-  if (!accessToken) {
-    alert("로그인이 필요합니다.")
-    router.push('/')
-    return
-  }
+  // 더미 데이터만 사용
+  rcmdNews.value = dummyRcmdNews.map(item => ({ ...item }));
+}
 
-  try {
-    const response = await apiRequest(`/api/news/recommend`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-
-    if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.")
-      router.push('/')
-      return
+// 뉴스 좋아요 토글 (더미 데이터에서만 동작)
+function toggleLike(newsItem) {
+  newsItem.liked = !newsItem.liked;
+  if (newsItem.liked) {
+    newsItem.likeCount++;
+  } else {
+    if (newsItem.likeCount > 0) {
+      newsItem.likeCount--;
     }
-
-    if (!response.ok) throw new Error('추천 뉴스 목록 API 호출 실패')
-
-    const newsData = await response.json();
-    rcmdNews.value = newsData.map(item => ({
-      ...item,
-      likeCount: item.likeCount || 0,
-      isLiked: item.liked || false,
-    }));
-
-  } catch (err) {
-    console.error('오류 발생:', err)
-    alert(err.message || '추천 뉴스 목록을 가져오는 중 오류가 발생했습니다.')
   }
 }
 
-// 뉴스 좋아요 토글
-async function toggleLike(newsItem) {
-  try {
-    const response = await apiRequest(`/api/news/${newsItem.newsId}/like`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      throw new Error('좋아요 처리 중 오류가 발생했습니다.');
-    }
-
-    const result = await response.json();
-    newsItem.liked = result.liked;
-    
-    if (result.liked) {
-      newsItem.likeCount++;
-    } else {
-      if (newsItem.likeCount > 0) {
-        newsItem.likeCount--;
-      }
-    }
-
-  } catch (error) {
-    console.error('좋아요 처리 실패:', error);
-    alert(error.message || '좋아요 처리에 실패했습니다.');
-  }
-}
-
-//관리자 토글
-async function toggleVisibility(newsItem) {
-  const originalVisible = newsItem.visible
-  newsItem.visible = !newsItem.visible
-
-  try {
-    const accessToken = userStore.token
-    if (!accessToken) {
-      alert('인증이 만료되었습니다. 다시 로그인해주세요.')
-      newsItem.visible = originalVisible
-      router.push('/')
-      return
-    }
-
-    const response = await apiRequest(`/api/admin/news/${newsItem.newsId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ visible: newsItem.visible }),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(errorText || '뉴스 상태 변경에 실패했습니다.')
-    }
-  } catch (error) {
-    // 실패 시 롤백
-    newsItem.visible = originalVisible
-    console.error('뉴스 상태 변경 중 오류 발생:', error)
-    alert('오류: ' + error.message)
-  }
+// 관리자 토글 (더미 데이터에서만 동작)
+function toggleVisibility(newsItem) {
+  newsItem.visible = !newsItem.visible;
 }
 </script>

@@ -90,57 +90,26 @@ import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 
+
+// 더미 유저 데이터
 const user = ref({
-  userId: '',
-  userName: '',
-  userPassword: '',
-  role: '',
+  userId: 'dummyuser',
+  userName: '홍길동',
+  userPassword: 'password123',
+  role: 'USER',
 });
 
 const passwordFieldType = ref('password');
 
-onMounted(async () => {
-  const userId = route.query.userId;
-  if (!userId) {
-    alert("잘못된 접근입니다.");
-    router.push('/userList');
-    return;
-  }
 
-  try {
-    const response = await fetch("/api/user/" + userId);
-    if (!response.ok) {
-      throw new Error("사용자 조회 실패");
-    }
-    const userData = await response.json();
-    user.value = userData;
-  } catch (error) {
-    console.error("조회 오류:", error);
-    alert("사용자 정보를 불러오는 데 실패했습니다.");
-    router.push('/userList');
-  }
+onMounted(() => {
+  // 더미 데이터만 사용
 });
 
-async function updateUser() {
-  try {
-    const response = await fetch("/api/user/" + user.value.userId, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(user.value)
-    });
 
-    if (!response.ok) {
-      throw new Error("수정 실패");
-    }
-
-    alert("회원 정보가 수정되었습니다");
-    router.push('/userList');
-  } catch (error) {
-    console.error("수정 중 오류 발생:", error);
-    alert("회원 정보 수정 중 오류가 발생했습니다.");
-  }
+function updateUser() {
+  alert("회원 정보가 수정되었습니다 (임시)");
+  router.push('/userList');
 }
 
 function moveToBack() {

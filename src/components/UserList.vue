@@ -69,59 +69,36 @@ import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
-const users = ref([]);
+
+// 더미 회원 데이터 (UserInfo.vue와 연결)
+const users = ref([
+  {
+    userId: 'dummyuser',
+    userName: '홍길동',
+    userPassword: 'password123',
+    role: 'USER',
+  },
+  {
+    userId: 'admin',
+    userName: '관리자',
+    userPassword: 'adminpw',
+    role: 'ADMIN',
+  },
+  {
+    userId: 'testuser',
+    userName: '테스터',
+    userPassword: 'testpw',
+    role: 'USER',
+  }
+]);
 
 onMounted(() => {
-  fetchUsers();
+  // 더미 데이터만 사용
 });
 
-const fetchUsers = async () => {
-  const accessToken = userStore.token;
-  if (!accessToken) {
-    alert("로그인이 필요합니다.");
-    router.push('/');
-    return;
-  }
-
-  try {
-    const response = await apiRequest('/api/user', {
-      method: 'GET',
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
-
-    if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-      router.push('/');
-      return;
-    }
-    if (!response.ok) {
-      throw new Error("회원 목록 API 호출 실패");
-    }
-
-    const data = await response.json();
-    users.value = data;
-  } catch (error) {
-    console.error("오류 발생:", error);
-  }
-};
-
-const deleteUser = async (userId) => {
-  if (confirm(userId + "님을 삭제하시겠습니까?")) {
-    try {
-      const response = await apiRequest(`/api/user/${userId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error("삭제 실패");
-      }
-
-      users.value = users.value.filter(user => user.userId !== userId);
-    } catch (error) {
-      console.error("삭제 중 오류 발생:", error);
-    }
+const deleteUser = (userId) => {
+  if (confirm(userId + "님을 삭제하시겠습니까? (임시)")) {
+    users.value = users.value.filter(user => user.userId !== userId);
   }
 };
 

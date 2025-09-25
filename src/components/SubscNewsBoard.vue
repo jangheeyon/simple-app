@@ -82,194 +82,126 @@ import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
+
 const news = ref([])
-const similarNews = ref([]);
+const similarNews = ref([])
 const searchQuery = ref("")
+
+// 더미 뉴스 데이터
+const dummyNews = [
+  {
+    newsId: 1,
+    title: '구독 더미 뉴스 1',
+    description: '구독자용 더미 뉴스 설명입니다.',
+    link: 'https://example.com/subsc1',
+    pubDt: '2025-09-25',
+    keywords: '구독,AI',
+    likeCount: 5,
+    liked: false,
+    visible: true
+  },
+  {
+    newsId: 2,
+    title: '구독 더미 뉴스 2',
+    description: '두 번째 구독 더미 뉴스 설명입니다.',
+    link: 'https://example.com/subsc2',
+    pubDt: '2025-09-24',
+    keywords: '구독,테스트',
+    likeCount: 2,
+    liked: true,
+    visible: true
+  },
+  {
+    newsId: 3,
+    title: '구독 더미 뉴스 3',
+    description: '세 번째 구독 더미 뉴스 설명입니다.',
+    link: 'https://example.com/subsc3',
+    pubDt: '2025-09-23',
+    keywords: '구독,Vue',
+    likeCount: 0,
+    liked: false,
+    visible: false
+  }
+];
+
+// 더미 유사 뉴스 데이터
+const dummySimilarNews = [
+  {
+    newsId: 201,
+    title: '구독 유사 뉴스 A',
+    description: '구독 유사 뉴스 설명입니다.',
+    link: 'https://example.com/subsc-similar1',
+    pubDt: '2025-09-25',
+    keywords: '추천,AI',
+    likeCount: 1,
+    liked: false,
+    visible: true
+  },
+  {
+    newsId: 202,
+    title: '구독 유사 뉴스 B',
+    description: '두 번째 구독 유사 뉴스 설명입니다.',
+    link: 'https://example.com/subsc-similar2',
+    pubDt: '2025-09-24',
+    keywords: '추천,테스트',
+    likeCount: 0,
+    liked: false,
+    visible: true
+  }
+];
+
 
 onMounted(() => fetchNews())
 
 const fetchNews = async (keyword = "") => {
-  const accessToken = userStore.token;
-  if (!accessToken) {
-    alert("로그인이 필요합니다.")
-    router.push('/')
-    return
+  // 더미 데이터만 사용
+  if (!keyword) {
+    news.value = dummyNews.map(item => ({ ...item }));
+  } else {
+    news.value = dummyNews.filter(item =>
+      item.title.includes(keyword) ||
+      item.description.includes(keyword) ||
+      (item.keywords && item.keywords.includes(keyword))
+    ).map(item => ({ ...item }));
   }
-
-  try {
-    const response = await apiRequest('/api/news/subscribe', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-
-    if (response.status === 401 || response.status === 403) {
-      alert("인증이 필요합니다. 로그인 페이지로 이동합니다.")
-      router.push('/')
-      return
-    }
-
-    if (!response.ok) throw new Error('뉴스 목록 API 호출 실패')
-
-    const newsData = await response.json();
-        news.value = newsData.map(item => ({
-      ...item,
-      likeCount: item.likeCount || 0,
-      isLiked: item.liked || false,
-    }));
-
-  } catch (err) {
-    console.error('오류 발생:', err)
-    alert(err.message || '뉴스 목록을 가져오는 중 오류가 발생했습니다.')
-  }
+  // 유사 뉴스도 항상 더미로 표출
+  similarNews.value = dummySimilarNews.map(item => ({ ...item }));
 }
 
 const searchNews = async () => {
-    const accessToken = userStore.token;
-    if (!accessToken) {
-        alert("로그인이 필요합니다.");
-        router.push('/');
-        return;
-    }
-
-    if (!searchQuery.value.trim()) {
-        fetchNews();
-        similarNews.value = [];
-        return;
-    }
-
-    //뉴스 초기화
-    news.value = [];
-    similarNews.value = [];
-
-    try {
-        // 뉴스 검색
-        const response = await apiRequest(`/api/news/search?q=${encodeURIComponent(searchQuery.value)}`, {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        if (response.status === 401 || response.status === 403) {
-            alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-            router.push('/');
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error('뉴스 검색 API 호출 실패');
-        }
-
-        const searchData = await response.json();
-        news.value = searchData.map(item => ({
-            ...item,
-            likeCount: item.likeCount || 0,
-            isLiked: item.liked || false,
-        }));
-        
-        // 유사 뉴스 검색
-        if (news.value.length > 0) {
-            const firstNewsId = news.value[0].newsId; // 첫 번째 뉴스 ID 추출
-
-            const similarNewsResponse = await apiRequest(`/api/news/${firstNewsId}/similar`, {
-                method: 'GET',
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
-
-            if (similarNewsResponse.ok) {
-                const similarNewsData = await similarNewsResponse.json();
-                similarNews.value = similarNewsData.map(item => ({
-                    ...item,
-                    likeCount: item.likeCount || 0,
-                    isLiked: item.liked || false,
-                }));
-            } else {
-                console.error('유사 뉴스 API 호출 실패');
-                similarNews.value = [];
-            }
-        }
-
-    } catch (err) {
-        console.error('오류 발생:', err);
-        alert(err.message || '뉴스 검색 중 오류가 발생했습니다.');
-        news.value = [];
-        similarNews.value = [];
-    } 
+  // 검색어가 없으면 전체 더미 뉴스, 있으면 필터링
+  if (!searchQuery.value.trim()) {
+  fetchNews();
+  return;
+  }
+  news.value = dummyNews.filter(item =>
+  item.title.includes(searchQuery.value) ||
+  item.description.includes(searchQuery.value) ||
+  (item.keywords && item.keywords.includes(searchQuery.value))
+  ).map(item => ({ ...item }));
+  // 유사 뉴스도 항상 더미로 표출
+  similarNews.value = dummySimilarNews.map(item => ({ ...item }));
 };
 
-// 뉴스 좋아요 토글
-async function toggleLike(newsItem) {
-  try {
-    const response = await apiRequest(`/api/news/${newsItem.newsId}/like`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      throw new Error('좋아요 처리 중 오류가 발생했습니다.');
+// 뉴스 좋아요 토글 (더미 데이터에서만 동작)
+function toggleLike(newsItem) {
+  newsItem.liked = !newsItem.liked;
+  if (newsItem.liked) {
+    newsItem.likeCount++;
+  } else {
+    if (newsItem.likeCount > 0) {
+      newsItem.likeCount--;
     }
-
-    const result = await response.json();
-    newsItem.liked = result.liked;
-    
-    if (result.liked) {
-      newsItem.likeCount++;
-    } else {
-      if (newsItem.likeCount > 0) {
-        newsItem.likeCount--;
-      }
-    }
-
-  } catch (error) {
-    console.error('좋아요 처리 실패:', error);
-    alert(error.message || '좋아요 처리에 실패했습니다.');
   }
 }
 
-//관리자 토글
-async function toggleVisibility(newsItem) {
-  const originalVisible = newsItem.visible
-  newsItem.visible = !newsItem.visible
-
-  try {
-    const accessToken = userStore.token
-    if (!accessToken) {
-      alert('인증이 만료되었습니다. 다시 로그인해주세요.')
-      newsItem.visible = originalVisible
-      router.push('/')
-      return
-    }
-
-    const response = await apiRequest(`/api/admin/news/${newsItem.newsId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ visible: newsItem.visible }),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(errorText || '뉴스 상태 변경에 실패했습니다.')
-    }
-  } catch (error) {
-    // 실패 시 롤백
-    newsItem.visible = originalVisible
-    console.error('뉴스 상태 변경 중 오류 발생:', error)
-    alert('오류: ' + error.message)
-  }
+// 관리자 토글 (더미 데이터에서만 동작)
+function toggleVisibility(newsItem) {
+  newsItem.visible = !newsItem.visible;
 }
 
-// 뉴스 조회수 카운트
-async function countView(newsItem) {
-  try {
-    const
-      response = await apiRequest(`/api/news/${newsItem.newsId}/view`, {
-      method: 'POST',
-    })
-    if (!response.ok) {
-      throw new Error('조회수 처리 중 오류가 발생했습니다.')
-    }
-  } catch (error) {
-    console.error('조회수 처리 실패:', error)
-  }
+// 뉴스 조회수 카운트 (임시: 아무 동작 없음)
+function countView(newsItem) {
+  // 퍼블리셔용: 조회수 처리 없음
 }
 </script>

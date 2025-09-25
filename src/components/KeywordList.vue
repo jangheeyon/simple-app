@@ -59,60 +59,22 @@ import Sidebar from "@/components/Sidebar.vue"
 import { useCommon } from "@/composables/useCommon"
 
 const { apiRequest, userStore, router } = useCommon()
-const keywords = ref([]);
-const userId = userStore.userId;
+
+// 더미 키워드 데이터
+const keywords = ref([
+  { keywordId: 1, keyword: 'AI' },
+  { keywordId: 2, keyword: '프론트엔드' },
+  { keywordId: 3, keyword: '테스트' },
+  { keywordId: 4, keyword: '클라우드' },
+]);
 
 onMounted(() => {
-  fetchkeywords();
+  // 더미 데이터만 사용
 });
 
-const fetchkeywords = async () => {
-    const accessToken = userStore.token;
-    if (!accessToken) {
-        alert("로그인이 필요합니다.");
-        router.push('/');
-        return;
-    }
-
-    try {
-        const response = await apiRequest(`/api/news/keyword/${userId}`, {
-        method: 'GET',
-        headers: {
-            "Authorization": `Bearer ${accessToken}`
-        }
-        });
-
-        if (response.status === 401 || response.status === 403) {
-        alert("인증이 필요합니다. 로그인 페이지로 이동합니다.");
-        router.push('/');
-        return;
-        }
-        if (!response.ok) {
-        throw new Error("키워드 목록 API 호출 실패");
-        }
-
-        const data = await response.json();
-        keywords.value = data;
-    } catch (error) {
-        console.error("오류 발생:", error);
-    }
-};
-
-const deleteKeyword = async (keywordId) => {
-  if (confirm("해당 키워드를 삭제하시겠습니까?")) {
-    try {
-      const response = await apiRequest(`/api/news/keyword/${keywordId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error("삭제 실패");
-      }
-
-      keywords.value = keywords.value.filter(keyword => keyword.keywordId !== keywordId);
-    } catch (error) {
-      console.error("삭제 중 오류 발생:", error);
-    }
+const deleteKeyword = (keywordId) => {
+  if (confirm("해당 키워드를 삭제하시겠습니까? (임시)")) {
+    keywords.value = keywords.value.filter(keyword => keyword.keywordId !== keywordId);
   }
 };
 
